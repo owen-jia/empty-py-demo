@@ -26,3 +26,8 @@ cd mysite
 
 python manage.py runserver 8081
 
+## 测试脚本运行
+
+执行poll应用下测试脚本
+
+manage.py test polls
