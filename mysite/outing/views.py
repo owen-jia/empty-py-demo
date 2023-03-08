@@ -19,7 +19,9 @@ def json(request):
 
 def form_save(request):
     logger.warning(request)
-    logger.warning(request.method)
+    logger.info(request.method)
+    logger.debug(request.method)
+    logger.error(request.method)
     if request.method == 'POST':
         return HttpResponse({"status ok"})
     else:
