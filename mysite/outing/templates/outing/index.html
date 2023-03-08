@@ -1,0 +1,38 @@
+{% load static %}
+<html>
+<head>
+    <title>outing</title>
+    <link rel="stylesheet" href="{% static 'outing/style.css' %}">
+</head>
+<body>
+    <h1>hello,outing</h1>
+    <div>
+        <form>
+            <div>
+                <label>title</label>
+                <div>
+                    <input type="text" value="" placeholder="title"/>
+                </div>
+            </div>
+            <div>
+                <label>content</label>
+                <div>
+                    <textarea value="" placeholder="content"></textarea>
+                </div>
+            </div>
+            <div>
+                <label>date</label>
+                <div>
+                    <input type="date" value="" placeholder="date">
+                </div>
+            </div>
+            <div>
+                <label>&nbsp;</label>
+                <div>
+                    <input id="submit" type="submit" value="提交" placeholder="保存">
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
