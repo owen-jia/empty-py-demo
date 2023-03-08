@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 
-def tpl(request):
+def index(request):
     context = {
         'latest_question_list': 'ok',
     }
@@ -10,4 +10,4 @@ def tpl(request):
 
 
 def json(request):
-    return HttpResponse("Hello, world. You're at the outing index.")
+    return HttpResponse("Hello, JSON. You're at the outing index.")

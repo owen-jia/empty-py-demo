@@ -3,6 +3,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.json, name='json'),
-    path('tpl/', views.tpl, name='template'),
+    path('', views.index, name='index'),
+    path('json/', views.json, name='json')
 ]
