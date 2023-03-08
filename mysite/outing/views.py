@@ -1,5 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -11,3 +15,12 @@ def index(request):
 
 def json(request):
     return HttpResponse("Hello, JSON. You're at the outing index.")
+
+
+def form_save(request):
+    logger.warning(request)
+    logger.warning(request.method)
+    if request.method == 'POST':
+        return HttpResponse({"status ok"})
+    else:
+        return HttpResponse({"status failure"})
