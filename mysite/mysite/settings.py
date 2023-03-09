@@ -132,6 +132,7 @@ LOGGING = {
             'filename': 'mysite.log',
             'level': 'DEBUG',
             'formatter': 'standard',
+            'encoding': 'utf8',
         },
         'rolling': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -140,6 +141,7 @@ LOGGING = {
             'formatter': 'standard',
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
+            'encoding': 'utf8',
         },
     },
     'loggers': {
