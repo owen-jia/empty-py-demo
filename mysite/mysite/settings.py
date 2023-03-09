@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -15,7 +15,6 @@ SECRET_KEY = "django-insecure-_az(-9_iq1pa=7=9zl6c^*ws0(9!z2u1%($%pdf=cg2t=k_b@f
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -60,7 +59,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "mysite.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -70,7 +68,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -90,7 +87,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -101,7 +97,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -114,24 +109,10 @@ STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGGING = {
-    'version': 1,                       # the dictConfig format version
+    'version': 1,  # the dictConfig format version
     'disable_existing_loggers': False,  # retain the default loggers
-    'handlers': {
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'mysite.log',
-            'level': 'DEBUG',
-            'formatter': 'simple',
-        },
-    },
-    'loggers': {
-        '': {
-            'level': 'DEBUG',
-            'handlers': ['file'],
-        },
-    },
     'formatters': {
-        'verbose': {
+        'standard': {
             'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
             'style': '{',
         },
@@ -139,5 +120,36 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'simple',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'mysite.log',
+            'level': 'DEBUG',
+            'formatter': 'standard',
+        },
+        'rolling': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'mysite.log',
+            'level': 'DEBUG',
+            'formatter': 'standard',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+        },
+    },
+    'loggers': {
+        'outing': {
+            'level': 'DEBUG',
+            'handlers': ['file'],
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'DEBUG',
     },
 }

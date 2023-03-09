@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Article(models):
+class Article(models.Model):
     """文章表"""
 
     title = models.TextField(null=False, blank=False, primary_key=True, max_length=200, unique=True)
@@ -9,4 +9,4 @@ class Article(models):
     publish_date = models.DateField(verbose_name='发布时间')
 
     def __str__(self):
-        return self.title
+        return self.title + " --- " + self.content

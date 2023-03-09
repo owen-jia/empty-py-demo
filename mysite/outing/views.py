@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 import logging
-from models import Article
+from .models import Article
+import datetime
 
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,10 @@ def form_save(request):
     logger.debug(request.method)
     logger.error(request.method)
     if request.method == 'POST':
-        logger.info(request.body)
+        article_obj = Article("今日最牛大外宣", "内容本身就很牛", datetime.date)
+        print(article_obj)
+        print(request.method)
+        logger.info(article_obj)
         return HttpResponse({"status ok"})
     else:
         return HttpResponse({"status failure"})
