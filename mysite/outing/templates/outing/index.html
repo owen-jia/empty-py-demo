@@ -36,9 +36,19 @@
         </form>
     </div>
     <script src="{% static 'outing/util.js' %}"></script>
+    <script src="{% static 'outing/js/jquery.js' %}"></script>
+    <script src="{% static 'outing/js/axios.js' %}"></script>
     <script type="text/javascript">
-        test()
-        alert("warning");
+        test();
+        $('#submit').bind('click',function(){
+            axios.post('http://127.0.0.1:8081/outing/api/form/save',{
+                'testy':'test001'
+            }).then(resp => {
+                console.log(JSON.stringify(resp));
+            }).catch(err => {
+                console.log(JSON.stringify(err))
+            })
+        });
     </script>
 </body>
 </html>
