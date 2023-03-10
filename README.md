@@ -20,6 +20,10 @@ python manage.py migrate
 
 python manage.py createsuperuser
 
+未model创建数据表并创建database-access api(orm关联)
+
+python manage.py makemigrations outing
+
 ## 启动django服务
 
 cd mysite

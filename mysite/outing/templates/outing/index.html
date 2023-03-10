@@ -1,5 +1,5 @@
 {% load static %}
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <title>outing</title>
     <link rel="stylesheet" href="{% static 'outing/style.css' %}">
@@ -12,19 +12,19 @@
             <div>
                 <label>title</label>
                 <div>
-                    <input type="text" value="" placeholder="title"/>
+                    <input id="title" value="" type="text" placeholder="title"/>
                 </div>
             </div>
             <div>
                 <label>content</label>
                 <div>
-                    <textarea value="" placeholder="content"></textarea>
+                    <textarea id="content" placeholder="content"></textarea>
                 </div>
             </div>
             <div>
                 <label>date</label>
                 <div>
-                    <input type="date" value="" placeholder="date">
+                    <input id="date" type="date" value="" placeholder="date">
                 </div>
             </div>
             <div>
@@ -35,16 +35,48 @@
             </div>
         </form>
     </div>
+
+    <div>
+        <ul id="article-ul">
+        {% if article_all %}
+            {% for article in article_all %}
+                <li>{{ article.title }} <a href="#">remove</a></li>
+            {% endfor %}
+        {% else %}
+            <li>No polls are available.</li>
+        {% endif %}
+        </ul>
+    </div>
+
     <script src="{% static 'outing/util.js' %}"></script>
     <script src="{% static 'outing/js/jquery.js' %}"></script>
     <script src="{% static 'outing/js/axios.js' %}"></script>
     <script type="text/javascript">
         test();
         $('#submit').bind('click',function(){
-            axios.post('http://127.0.0.1:8081/outing/api/form/save',{
+            var data = {
                 'testy':'test001'
-            }).then(resp => {
+                ,'csrfmiddlewaretoken': '{{ csrf_token }}'
+                ,'title': $('#title').val()
+                ,'content': $('#content').val()
+                ,'date': $('#date').val()
+            }
+            axios.post(
+                'http://127.0.0.1:8081/outing/api/form/save'
+                ,JSON.stringify(data)
+                ,{
+                    headers: {'content-type': 'application/json'}
+                }
+            ).then(resp => {
                 console.log(JSON.stringify(resp));
+                a_list = resp.data.data
+                var li_str = ""
+                for (var i=0;i<a_list.length;i++)
+                {
+                    li_str+="<li>"+a_list[i].title+"<a href='#'>remove</a></li>"
+                }
+                console.info(li_str)
+                $('#article-ul').append(li_str);
             }).catch(err => {
                 console.log(JSON.stringify(err))
             })

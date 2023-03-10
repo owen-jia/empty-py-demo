@@ -8,5 +8,5 @@ class Article(models.Model):
     content = models.TextField(max_length=1000, default='', verbose_name='内容')
     publish_date = models.DateField(verbose_name='发布时间')
 
-    def __str__(self):
-        return self.title + " --- " + self.content
+    # def __str__(self):
+    #     return self.title
