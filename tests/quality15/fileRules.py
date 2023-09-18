@@ -4,6 +4,7 @@
 import os
 import string
 import sys
+from datetime import datetime
 from ftplib import FTP
 
 # author=Owen Jia
@@ -41,7 +42,7 @@ def line_file(win: int, lines: []):
         i = 0
         while i < len(lines):
             line = lines[i]
-            f_date = line[0:8]
+            f_date = line[0:9].strip()
             f_time = line[10:17]
             f_size = line[18:38].strip()
             f_name = line[39:len(line)]
@@ -59,7 +60,24 @@ def line_file(win: int, lines: []):
             line = lines[i]
 
             f_date = line[43:49]
+
+            f_date = f_date.replace("Jan", "01")
+            f_date = f_date.replace("Feb", "02")
+            f_date = f_date.replace("Mar", "03")
+            f_date = f_date.replace("Apr", "04")
+            f_date = f_date.replace("May", "05")
+            f_date = f_date.replace("Jun", "06")
+            f_date = f_date.replace("Jan", "07")
+            f_date = f_date.replace("Aug", "08")
+            f_date = f_date.replace("Sep", "09")
+            f_date = f_date.replace("Oct", "10")
+            f_date = f_date.replace("Nov", "11")
+            f_date = f_date.replace("Dec", "12")
+
             f_time = line[50:55]
+            if len(f_time) != 4:
+                f_date = f_date + " " + str(datetime.today().year)
+
             f_size = line[30:42].strip()
             f_name = line[56:len(line)]
             f = {
@@ -122,8 +140,35 @@ def file_size(f_list: [], f_size: int):
     return "#size|"+str(flag)+"|"+str(f_list)+"#"
 
 
-def file_last_time(f: FTP):
+def file_date(f_list: [], last_date):
+    """ 检查目录下文件更新时间数量 """
+    last_date_new = datetime.strptime(last_date, "%Y-%m-%d %H:%M:%S")
+    flag = 0
+    i = 0
+    while i < len(f_list):
+        t = f_list[i]
+        dt = t['date'] + " " + t['time']
+
+        if dt.find('PM') >= 0 or dt.find('AM') >= 0:
+            last = datetime.strptime(dt, "%m-%d-%y %H:%M%p")
+        else:
+            if len(t['time']) == 4:
+                last = datetime.strptime(dt, "%m %d %Y")
+            else:
+                last = datetime.strptime(dt, "%m %d %Y %H:%M")
+
+        if last > last_date_new:
+            flag += 1
+
+        i += 1
+
     print("file_last_time")
+    last = datetime.strptime(last_date, "%Y-%m-%d %H:%M:%S")
+    print(datetime.now())
+    print(datetime.now() < last)
+    print(last)
+    print("文件更新时间检查完成")
+    return "#date|"+str(flag)+"|"+str(f_list)+"#"
 
 
 def file_count(f_list: [], f_count):
@@ -163,7 +208,6 @@ def service(cmd, host, port: int, user, passwd, protocol: int, path, args: []):
     if "help" == cmd:
         print("仅支持命令: help|exist|size|count|type|date|data")
     elif "exist" == cmd:
-        print("规则<文件是否存在检测>")
         ftp = conn(host, port, user, passwd)
         files = dir_file(ftp, path)
         close(ftp)
@@ -183,6 +227,11 @@ def service(cmd, host, port: int, user, passwd, protocol: int, path, args: []):
         files = dir_file(ftp, path)
         close(ftp)
         result = file_size(files, args[0])
+    elif "date" == cmd:
+        ftp = conn(host, port, user, passwd)
+        files = dir_file(ftp, path)
+        close(ftp)
+        result = file_date(files, args[0])
     else:
         print("cmd: help|exist|size|sum|date|data")
 
@@ -222,15 +271,8 @@ def read_argv():
     global f_path
     f_path = sys.argv[7]
     global f_args
-    f_args = []
-    if f_cmd == "exist":
-        f_args.append(sys.argv[8])
-    elif f_cmd == "count":
-        f_args.append(sys.argv[8])
-    elif f_cmd == "type":
-        f_args.append(sys.argv[8])
-    elif f_cmd == "size":
-        f_args.append(sys.argv[8])
+    f_args.clear()
+    f_args.append(sys.argv[8])
 
     print("read_argv:", f_cmd, f_host, f_port, f_account, f_password, f_protocol, f_path, f_args)
 
@@ -243,6 +285,8 @@ def read_argv():
 # python fileRules.py "type" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "xls,doc,txt"
 # python fileRules.py "size" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "398"
 # python fileRules.py "size" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "445"
+# python fileRules.py "date" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2023-12-09 06:34:45"
+# python fileRules.py "date" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2023-09-14 06:14:45"
 
 
 if __name__ == '__main__':
