@@ -1,11 +1,14 @@
 # !/usr/bin/python3
 # coding=utf-8
-
-import os
+# -*- coding: utf-8 -*-
+import re
 import string
 import sys
-from datetime import datetime
+from datetime import datetime, time
 from ftplib import FTP
+
+import paramiko
+
 
 # author=Owen Jia
 # email=owen-jia@outlook.com
@@ -25,6 +28,37 @@ def conn(host, port: int, user, passwd):
         f.encoding = 'GBK'
     print("ftp连接成功")
     return f
+
+
+def conn_sftp(host, port, user, passwd, path):
+    try:
+        new_list: list = []
+        transport = paramiko.Transport((host, port))
+        transport.connect(username=user, password=passwd)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        listdir_attr = sftp.listdir_attr(path)
+        sftp.close()
+
+        i = 0
+        while i < len(listdir_attr):
+            file = listdir_attr[i]
+
+            if file.longname.find("dr") < 0:
+                print(file.longname)
+                t_date = datetime.fromtimestamp(file.st_atime)
+                file = {
+                    "name": file.filename,
+                    "date": t_date.strftime("%Y-%m-%d %H:%M:%S"),
+                    "time": t_date.strftime("%H:%M:%S"),
+                    "size": file.st_size
+                }
+                new_list.append(file)
+
+            i += 1
+
+        return new_list
+    except Exception as e:
+        print(e)
 
 
 def close(f: FTP):
@@ -162,11 +196,6 @@ def file_date(f_list: [], last_date):
 
         i += 1
 
-    print("file_last_time")
-    last = datetime.strptime(last_date, "%Y-%m-%d %H:%M:%S")
-    print(datetime.now())
-    print(datetime.now() < last)
-    print(last)
     print("文件更新时间检查完成")
     return "#date|"+str(flag)+"|"+str(f_list)+"#"
 
@@ -188,10 +217,10 @@ def file_type(f_list: [], f_types):
     while i < len(f_list):
         t = f_list[i]
         f_n = t['name']
-        print("name--",f_n)
-        tail = f_n.split(".")[1]
-        if str(f_types).find(tail) >= 0:
-            flag += 1
+        if f_n.find(".") >= 0:
+            tail = f_n.split(".")[1]
+            if str(f_types).find(tail) >= 0:
+                flag += 1
         i += 1
 
     print('文件类型检测完成')
@@ -202,9 +231,65 @@ def file_data_count(f: FTP):
     print("file_data_count")
 
 
-def service(cmd, host, port: int, user, passwd, protocol: int, path, args: []):
+def timestamp_convert_str(str_format, timestamp):
+    """
+    时间戳 转 字符串
+    :param timestamp: 1676554320
+    :param str_format:"%Y-%m-%d %H:%M:%S"
+    :return:
+    """
+    timestamp = int(timestamp) if isinstance(
+        timestamp, str) and len(timestamp) == 10 else timestamp
+    return time.strftime(str_format, time.localtime(timestamp))
+
+
+def service_sftp(cmd, host, port: int, user, passwd, protocol: int, path, args: []):
     result = ""
-    print("args:",args)
+    if "help" == cmd:
+        print("仅支持命令: help|exist|size|count|type|date|data")
+    elif "exist" == cmd:
+        files = conn_sftp(host, port, user, passwd, path)
+        f_name = args[0]
+        result = file_exist(files, f_name)
+    elif "count" == cmd:
+        files = conn_sftp(host, port, user, passwd, path)
+        f_name = args[0]
+        result = file_count(files, f_name)
+    elif "type" == cmd:
+        files = conn_sftp(host, port, user, passwd, path)
+        f_name = args[0]
+        result = file_type(files, f_name)
+    elif "size" == cmd:
+        files = conn_sftp(host, port, user, passwd, path)
+        f_name = args[0]
+        result = file_size(files, f_name)
+    elif "date" == cmd:
+        files = conn_sftp(host, port, user, passwd, path)
+        f_name = args[0]
+        last_date_new = datetime.strptime(f_name, "%Y-%m-%d %H:%M:%S")
+
+        flag = 0
+        i = 0
+        while i < len(files):
+            f = files[i]
+            f_date = f['date']
+            if datetime.strptime(f_date, "%Y-%m-%d %H:%M:%S") >= last_date_new:
+                flag += 1
+            i += 1
+
+        result = "#date|" + str(flag) + "|" + str(files)
+    else:
+        print("cmd: help|exist|size|sum|date|data")
+
+    print("检查结果")
+    return result
+
+
+def service(cmd, host, port: int, user, passwd, protocol: int, path, args: []):
+    if int(protocol) == 2:
+        return service_sftp(cmd, host, port, user, passwd, protocol, path, args)
+
+    result = ""
     if "help" == cmd:
         print("仅支持命令: help|exist|size|count|type|date|data")
     elif "exist" == cmd:
@@ -239,14 +324,14 @@ def service(cmd, host, port: int, user, passwd, protocol: int, path, args: []):
     return result
 
 
-f_cmd = "count"  # exist
-f_protocol = 1  # 1 ftp 2 sftp
-f_host = "10.10.50.156"
-f_port: int = 21
-f_account = "ftptest"
-f_password = "123456"
-f_path = "/var/ftp/test"
-f_args = ['2']
+f_cmd = "exist"  # exist
+f_protocol = 2  # 1 ftp 2 sftp
+f_host = "10.10.90.246"
+f_port: int = 22
+f_account = "root"
+f_password = "Root1209."
+f_path = "/root"
+f_args = ['2.log']
 
 
 def read_argv():
@@ -277,16 +362,23 @@ def read_argv():
     print("read_argv:", f_cmd, f_host, f_port, f_account, f_password, f_protocol, f_path, f_args)
 
 
-# python fileRules.py "exist" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "hive规则模板修改"
-# python fileRules.py "exist" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "接口设计与表设计.xls"
-# python fileRules.py "count" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2"
-# python fileRules.py "count" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2"
-# python fileRules.py "type" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "xls,doc,txt"
-# python fileRules.py "type" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "xls,doc,txt"
-# python fileRules.py "size" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "398"
-# python fileRules.py "size" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "445"
-# python fileRules.py "date" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2023-12-09 06:34:45"
-# python fileRules.py "date" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2023-09-14 06:14:45"
+# python file-ftp.py "exist" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "hive规则模板修改"
+# python file-ftp.py "exist" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "接口设计与表设计.xls"
+# python file-ftp.py "count" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2"
+# python file-ftp.py "count" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2"
+# python file-ftp.py "type" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "xls,doc,txt"
+# python file-ftp.py "type" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "xls,doc,txt"
+# python file-ftp.py "size" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "398"
+# python file-ftp.py "size" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "445"
+# python file-ftp.py "date" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2023-12-09 06:34:45"
+# python file-ftp.py "date" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2023-09-14 06:14:45"
+
+
+# python file-ftp.py "exist" "10.10.61.146" "22" "test" "test" "2" "/" "2.log"
+# python file-ftp.py "count" "10.10.90.246" "22" "root" "Root1209." "2" "/root" "2"
+# python file-ftp.py "size" "10.10.90.246" "22" "root" "Root1209." "2" "/root" "1201"
+# python file-ftp.py "type" "10.10.61.146" "22" "test" "test" "2" "/" "log,zip,jar"
+# python file-ftp.py "date" "10.10.61.146" "22" "test" "test" "2" "/" "2023-09-14 06:14:45"
 
 
 if __name__ == '__main__':
