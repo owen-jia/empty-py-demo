@@ -276,7 +276,7 @@ def service_sftp(cmd, host, port: int, user, passwd, protocol: int, path, args: 
                 flag += 1
             i += 1
 
-        result = "#date|" + str(flag) + "|" + str(files)
+        result = "#date|" + str(flag) + "|" + str(files) + "#"
     else:
         print("cmd: help|exist|size|sum|date|data")
 
