@@ -1,7 +1,6 @@
 # !/usr/bin/python3
 # coding=utf-8
 # -*- coding: utf-8 -*-
-import re
 import string
 import sys
 from datetime import datetime, time
@@ -362,23 +361,23 @@ def read_argv():
     print("read_argv:", f_cmd, f_host, f_port, f_account, f_password, f_protocol, f_path, f_args)
 
 
-# python file-ftp.py "exist" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "hive规则模板修改"
-# python file-ftp.py "exist" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "接口设计与表设计.xls"
-# python file-ftp.py "count" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2"
-# python file-ftp.py "count" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2"
-# python file-ftp.py "type" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "xls,doc,txt"
-# python file-ftp.py "type" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "xls,doc,txt"
-# python file-ftp.py "size" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "398"
-# python file-ftp.py "size" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "445"
-# python file-ftp.py "date" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2023-12-09 06:34:45"
-# python file-ftp.py "date" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2023-09-14 06:14:45"
+# python file.py "exist" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "hive规则模板修改"
+# python file.py "exist" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "接口设计与表设计.xls"
+# python file.py "count" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2"
+# python file.py "count" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2"
+# python file.py "type" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "xls,doc,txt"
+# python file.py "type" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "xls,doc,txt"
+# python file.py "size" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "398"
+# python file.py "size" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "445"
+# python file.py "date" "10.10.50.68" "198" "ftptest" "123456" "1" "222" "2023-12-09 06:34:45"
+# python file.py "date" "10.10.50.156" "21" "ftptest" "123456" "1" "/var/ftp/test" "2023-09-14 06:14:45"
 
 
-# python file-ftp.py "exist" "10.10.61.146" "22" "test" "test" "2" "/" "2.log"
-# python file-ftp.py "count" "10.10.90.246" "22" "root" "Root1209." "2" "/root" "2"
-# python file-ftp.py "size" "10.10.90.246" "22" "root" "Root1209." "2" "/root" "1201"
-# python file-ftp.py "type" "10.10.61.146" "22" "test" "test" "2" "/" "log,zip,jar"
-# python file-ftp.py "date" "10.10.61.146" "22" "test" "test" "2" "/" "2023-09-14 06:14:45"
+# python file.py "exist" "10.10.61.146" "22" "test" "test" "2" "/" "2.log"
+# python file.py "count" "10.10.90.246" "22" "root" "Root1209." "2" "/root" "2"
+# python file.py "size" "10.10.90.246" "22" "root" "Root1209." "2" "/root" "1201"
+# python file.py "type" "10.10.61.146" "22" "test" "test" "2" "/" "log,zip,jar"
+# python file.py "date" "10.10.61.146" "22" "test" "test" "2" "/" "2023-09-14 06:14:45"
 
 
 if __name__ == '__main__':
